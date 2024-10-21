@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  ards_worker:
+    image: 10.18.27.131:17180/aic/celery-worker/ards_worker:v1.0.2
+    environment:
+      - CELERY_LOG_FILE=/app/logs/ards_celery_worker.log
+      - CELERY_BROKER_URL=amqp://cmuhaic:1234qwer@10.18.27.111:5672/ards-api
+      - CELERY_RESULT_BACKEND=mongodb://aicenter:1234qwer@10.18.27.131:27017/ARDS
+      - triton_client=http://10.20.8.137:12345
+      - HAPIFHIR_postgres=10.21.98.80:15432
+      - MONGO_MAINURI=10.18.27.131:27017
+      - MONGO_BACKUPURI=10.65.51.237:27017
+      - fhirmongo=FHIR
+      - fhircollect=resources
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - rabbitmq_rabbitmq_cluster
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # command: ["celery", "-A", "ards_worker", "worker", "--loglevel=info", "--logfile=/app/logs/ards_celery_worker.log"]
+
+  ards-flower:
+    image: 10.18.27.131:17180/aic/celery-worker/ards_dashboard:v1.0.2
+    ports:
+      - "5588:5555"  # Flower 預設監控端口
+    command: celery flower --broker=amqp://cmuhaic:1234qwer@10.18.27.111:5672/ards-api --port=5555
+    environment:
+      - CELERY_BROKER_URL=amqp://cmuhaic:1234qwer@10.18.27.111:5672/ards-api
+    networks:
+      - rabbitmq_rabbitmq_cluster
+
+networks:
+  rabbitmq_rabbitmq_cluster:
+    external: true

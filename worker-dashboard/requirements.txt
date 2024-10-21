@@ -1,0 +1,2 @@
+flower==2.0.1
+celery[mongodb]==5.3.5

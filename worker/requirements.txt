@@ -1,0 +1,9 @@
+celery[mongodb]==5.3.5
+requests
+pymongo==4.5.0
+fhirclient==4.1.0
+psycopg2==2.9.9
+sqlalchemy==1.4.49
+sqlmodel==0.0.9
+asyncpg
+pytz
